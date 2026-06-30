@@ -13,6 +13,7 @@ import {
   type GuildBasedChannel,
   type ModalSubmitInteraction
 } from "discord.js";
+import { config } from "../config/env.js";
 import { db } from "../database/index.js";
 import { logger } from "../logger.js";
 import {
@@ -26,7 +27,7 @@ const applicationModalPrefix = "application:submit:";
 const fieldValueLimit = 1024;
 const applicationCooldownSeconds = 24 * 60 * 60;
 
-type ApplicationType = "staff" | "development";
+type ApplicationType = "staff" | "development" | "epd";
 
 interface ApplicationQuestion {
   id: string;
@@ -42,7 +43,7 @@ interface ApplicationFlow {
   buttonEmoji: string;
   modalTitle: string;
   logTitle: string;
-  logChannelId: string;
+  logChannelId?: string;
   successMessage: string;
   questions: readonly ApplicationQuestion[];
 }
@@ -139,8 +140,51 @@ export const applicationFlows: Record<ApplicationType, ApplicationFlow> = {
         style: TextInputStyle.Paragraph
       }
     ]
+  },
+  epd: {
+    type: "epd",
+    buttonLabel: "Apply for EPD",
+    buttonEmoji: "\uD83D\uDE94",
+    modalTitle: "Everon Police Department Application",
+    logTitle: "New Everon Police Department Application",
+    logChannelId: config.epdApplicationLogChannelId,
+    successMessage: "Your Everon Police Department application has been submitted. Thank you for applying.",
+    questions: [
+      {
+        id: "age-timezone",
+        label: "Age / Timezone",
+        logLabel: "Age / Timezone",
+        style: TextInputStyle.Short
+      },
+      {
+        id: "character-name",
+        label: "Character Name",
+        logLabel: "Character Name",
+        style: TextInputStyle.Short
+      },
+      {
+        id: "rp-leo-experience",
+        label: "Previous RP / Law Enforcement Experience",
+        logLabel: "Previous RP / Law Enforcement Experience",
+        style: TextInputStyle.Paragraph
+      },
+      {
+        id: "epd-reason",
+        label: "Why do you want to join EPD?",
+        logLabel: "Why do you want to join the Everon Police Department?",
+        style: TextInputStyle.Paragraph
+      },
+      {
+        id: "availability",
+        label: "Weekly Availability",
+        logLabel: "Weekly Availability",
+        style: TextInputStyle.Paragraph
+      }
+    ]
   }
 };
+
+const mainApplicationTypes = ["staff", "development"] as const;
 
 function canSendApplicationLog(channel: GuildBasedChannel): channel is SendableApplicationLogChannel {
   return (
@@ -153,7 +197,7 @@ function canSendApplicationLog(channel: GuildBasedChannel): channel is SendableA
 }
 
 function getApplicationFlow(type: string): ApplicationFlow | undefined {
-  if (type === "staff" || type === "development") {
+  if (type === "staff" || type === "development" || type === "epd") {
     return applicationFlows[type];
   }
 
@@ -246,7 +290,9 @@ export function createApplicationPanelEmbed(): EmbedBuilder {
 export function createApplicationPanelActionRow(): ActionRowBuilder<ButtonBuilder> {
   const row = new ActionRowBuilder<ButtonBuilder>();
 
-  for (const flow of Object.values(applicationFlows)) {
+  for (const type of mainApplicationTypes) {
+    const flow = applicationFlows[type];
+
     row.addComponents(
       new ButtonBuilder()
         .setCustomId(createApplicationButtonId(flow))
@@ -257,6 +303,37 @@ export function createApplicationPanelActionRow(): ActionRowBuilder<ButtonBuilde
   }
 
   return row;
+}
+
+export function createEpdApplicationPanelEmbed(): EmbedBuilder {
+  return new EmbedBuilder()
+    .setColor(meridianBrandColor)
+    .setTitle("Everon Police Department Application")
+    .setDescription(
+      [
+        "Interested in serving Everon as part of the Police Department?",
+        "",
+        "Use the button below to submit your EPD application.",
+        "",
+        "Applications should include your character details, roleplay experience, law enforcement experience, and weekly availability."
+      ].join("\n")
+    )
+    .setFooter({
+      text: "Meridian Network Applications",
+      iconURL: meridianLogoAttachmentUrl
+    });
+}
+
+export function createEpdApplicationPanelActionRow(): ActionRowBuilder<ButtonBuilder> {
+  const flow = applicationFlows.epd;
+
+  return new ActionRowBuilder<ButtonBuilder>().addComponents(
+    new ButtonBuilder()
+      .setCustomId(createApplicationButtonId(flow))
+      .setLabel(flow.buttonLabel)
+      .setEmoji(flow.buttonEmoji)
+      .setStyle(ButtonStyle.Primary)
+  );
 }
 
 export function createApplicationModal(flow: ApplicationFlow): ModalBuilder {
@@ -341,6 +418,12 @@ export async function handleApplicationModal(interaction: ModalSubmitInteraction
     await interaction.editReply(
       `You can submit another ${flow.modalTitle} in ${formatRemainingCooldown(cooldownRemainingSeconds)}.`
     );
+    return;
+  }
+
+  if (!flow.logChannelId) {
+    logger.warn(`${flow.type} application log channel is not configured`);
+    await interaction.editReply("Your application could not be submitted because the application log channel is not configured.");
     return;
   }
 

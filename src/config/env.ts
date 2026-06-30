@@ -8,6 +8,7 @@ export interface Config {
   auditLogChannelId?: string;
   welcomeChannelId?: string;
   ticketLogChannelId?: string;
+  epdApplicationLogChannelId?: string;
   supportRoleId?: string;
   moderatorRoleId?: string;
   adminRoleId?: string;
@@ -43,6 +44,7 @@ export const config: Config = {
   auditLogChannelId: process.env.AUDIT_LOG_CHANNEL_ID || undefined,
   welcomeChannelId: process.env.WELCOME_CHANNEL_ID || undefined,
   ticketLogChannelId: process.env.TICKET_LOG_CHANNEL_ID || undefined,
+  epdApplicationLogChannelId: process.env.EPD_APPLICATION_LOG_CHANNEL_ID || undefined,
   supportRoleId: process.env.SUPPORT_ROLE_ID || undefined,
   moderatorRoleId: process.env.MODERATOR_ROLE_ID || undefined,
   adminRoleId: process.env.ADMIN_ROLE_ID || undefined,

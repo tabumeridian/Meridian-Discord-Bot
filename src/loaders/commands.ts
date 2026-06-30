@@ -3,6 +3,7 @@ import { announcementCommand } from "../commands/admin/announcement.js";
 import { claimCommand } from "../commands/admin/claim.js";
 import { closeCommand } from "../commands/admin/close.js";
 import { setupApplicationPanelCommand } from "../commands/admin/setupApplicationPanel.js";
+import { setupEpdApplicationPanelCommand } from "../commands/admin/setupEpdApplicationPanel.js";
 import { setupRoleSelectorCommand } from "../commands/admin/setupRoleSelector.js";
 import { setupRulesEmbedCommand } from "../commands/admin/setupRulesEmbed.js";
 import { setupRulesPanelCommand } from "../commands/admin/setupRulesPanel.js";
@@ -19,6 +20,7 @@ export function loadCommands(): Collection<string, SlashCommand> {
     setupRulesEmbedCommand,
     setupRoleSelectorCommand,
     setupApplicationPanelCommand,
+    setupEpdApplicationPanelCommand,
     setupTicketPanelCommand,
     announcementCommand,
     claimCommand,

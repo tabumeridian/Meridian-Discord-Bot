@@ -40,6 +40,7 @@ This project is intentionally only the stable foundation: slash commands, event 
    AUDIT_LOG_CHANNEL_ID=your_audit_log_channel_id
    WELCOME_CHANNEL_ID=your_welcome_channel_id
    TICKET_LOG_CHANNEL_ID=your_ticket_log_channel_id
+   EPD_APPLICATION_LOG_CHANNEL_ID=your_epd_application_log_channel_id
    SUPPORT_ROLE_ID=your_support_role_id
    MODERATOR_ROLE_ID=your_moderator_role_id
    ADMIN_ROLE_ID=your_admin_role_id
@@ -58,6 +59,7 @@ This project is intentionally only the stable foundation: slash commands, event 
 - `AUDIT_LOG_CHANNEL_ID`: Right-click the audit log channel -> Copy Channel ID
 - `WELCOME_CHANNEL_ID`: Right-click the welcome channel -> Copy Channel ID
 - `TICKET_LOG_CHANNEL_ID`: Right-click the ticket log channel -> Copy Channel ID
+- `EPD_APPLICATION_LOG_CHANNEL_ID`: Right-click the EPD application log channel -> Copy Channel ID
 - `SUPPORT_ROLE_ID`: Right-click the Support role -> Copy Role ID
 - `MODERATOR_ROLE_ID`: Right-click the Moderator role -> Copy Role ID
 - `ADMIN_ROLE_ID`: Right-click the Admin role -> Copy Role ID
@@ -114,20 +116,24 @@ npm start
 - `/setup-role-selector`: admin-only command that posts optional notification role buttons.
 - `/announcement`: admin-only command that opens a modal to post a branded announcement embed.
 - `/setup-application-panel`: admin-only command that posts Staff and Development application buttons.
+- `/setup-epd-application-panel`: admin-only command that posts the Everon Police Department application button.
 - `/setup-ticket-panel`: admin-only command that posts the ticket category selector.
 - `/claim`: staff-only fallback command for claiming the current ticket.
 - `/close`: staff-or-creator fallback command for closing the current ticket.
 
 ## Applications
 
-Run `/setup-application-panel` in the channel where members should apply. The panel opens Discord modals for Staff and Development applications.
+Run `/setup-application-panel` in the channel where members should apply for Staff or Development. The panel opens Discord modals for Staff and Development applications.
+
+Run `/setup-epd-application-panel` in the channel where members should apply for the Everon Police Department. The panel opens an EPD application modal.
 
 Application submissions are sent to:
 
 - Staff Applications: `1515111083377950720`
 - Development Applications: `1515111113606430902`
+- Everon Police Department Applications: `EPD_APPLICATION_LOG_CHANNEL_ID`
 
-The bot must be able to view and send messages in both application log channels.
+The bot must be able to view and send messages in the configured application log channels.
 
 ## Rules Verification Panel
 
